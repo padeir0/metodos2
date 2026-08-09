@@ -46,7 +46,7 @@ bool matrix_isUpperTriangular(const Matrix* A, double error) {
       return false;
     }
     j = i - 1;
-    while (j > 0) {
+    while (j >= 0) {
       if (fabs(matrix_at(A, i, j) - 0) > error) {
         return false;
       }
