@@ -25,3 +25,14 @@ os arquivos numerados de acordo com o cronograma devem ser bem separados visando
 a avaliação de cada um individualmente.
 
 Algoritmos podem depender um do outro livremente. Um exemplo pode incluir múltiplos algoritmos.
+
+## Como testar o código?
+
+Cada exemplo dentro da pasta `exemplos` pode ser rodado com o script `crun`.
+Os testes dentro de `tests` podem ser rodados com o script `test` ou `testp`,
+o arquivo `testp` testa se o código roda com vários compiladores em vários
+niveis de otimização (pra pegar UB, principalmente).
+
+Importante: o script `crun` e os testes rodam com `-fsanitize=address,undefined`
+que precisam das libs `libasan` e `libubsan`, se não estiver instalado,
+é só remover essa linha antes de rodar.
