@@ -10,12 +10,6 @@
 
 #include "common.h"
 
-/* NOTA: as UNSAFE-preconditions de matrix.h (dimensões inválidas,
-   formas incompatíveis, aliasing proibido, etc.) não são testadas
-   aqui. Cada uma tem seu próprio programa em tests/crash/, que
-   dispara o assert de propósito e espera o processo inteiro morrer
-   com SIGABRT -- ver tests/crash/m2_matrix_*_crash.c. */
-
 /* BEGIN: testing matrix_at / matrix_setAt */
 bool test_at_setAt_roundTrip(void) {
   Matrix* m = matrix_new(2, 3);
@@ -477,16 +471,7 @@ bool test_transpose_inPlaceSquare(void) {
 }
 /* END: testing matrix_transpose */
 
-/* BEGIN: reuse tests ("grow/shrink" analogue)
-   Matrix não tem noção de capacidade crescente feito Natural
-   (aloca um buffer de tamanho fixo de uma vez só em matrix_new).
-   O equivalente aqui é reaproveitar `C` entre chamadas: como as
-   operações não alocam, é responsabilidade delas não deixar resíduo
-   do conteúdo anterior de `C`. add/sub/scalarMult escrevem cada
-   célula de C incondicionalmente, então são seguras "de graça"; já
-   matrix_mult usa `C` como acumulador (+=), então precisa
-   zerar C explicitamente -- é exatamente o bug que essas duas
-   primeiras testam.
+/* BEGIN: reuse tests
 */
 bool test_mult_reuse_overwritesStaleData(void) {
   Matrix* a = matrix_new(2, 3);

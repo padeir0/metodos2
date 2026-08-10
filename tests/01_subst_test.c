@@ -2,21 +2,10 @@
    matrix_isUpperTriangular).
    Recomendo que rode com:
       gcc -Wall -fsanitize=address,undefined -Wextra -Werror -pedantic -Wconversion -Wstrict-prototypes -std=c99 -O2 01_subst_test.c -o out_substtest
-
-   ATENÇÃO: test_isUpperTriangular_falseForNonzeroInFirstColumn
-   documenta um bug real em matrix_isUpperTriangular (ver comentário
-   no próprio teste) e por isso FALHA contra a implementação atual
-   de lib/01_subst.h. Não é um teste malformado -- é o comportamento
-   correto sendo verificado contra uma implementação incorreta.
 */
 
 #include "common.h"
 #include "../lib/01_subst.h"
-
-/* NOTA: as UNSAFE-preconditions de 01_subst.h (error < 0) não são
-   testadas aqui. Cada uma tem seu próprio programa em tests/crash/,
-   que dispara o assert de propósito e espera o processo inteiro
-   morrer com SIGABRT -- ver tests/crash/m2_subst_*_crash.c. */
 
 /* BEGIN: testing matrix_isLowerTriangular */
 bool test_isLowerTriangular_trueForProperLowerTriangular(void) {
@@ -129,14 +118,6 @@ bool test_isUpperTriangular_falseForNonzeroBelowDiagonal(void) {
   return ok;
 }
 
-// BUG em lib/01_subst.h: o loop interno de matrix_isUpperTriangular
-// é `j = i - 1; while (j > 0) { ...; j--; }`, que nunca testa
-// j == 0. Ou seja, a coluna 0 abaixo da diagonal nunca é checada, e
-// qualquer lixo em A[i][0] (i > 0) passa despercebido.
-// Esse teste verifica o comportamento CORRETO (matriz com entrada
-// não-nula em A[1][0] não é triangular superior) e por isso falha
-// contra a implementação atual -- é esperado até a função ser
-// corrigida (o loop deveria ir até `j >= 0`, não `j > 0`).
 bool test_isUpperTriangular_falseForNonzeroInFirstColumn(void) {
   Matrix* a = matrix_new(3, 3);
   matrix_setIdentity(a);
@@ -172,9 +153,6 @@ bool test_isUpperTriangular_diagonalExactlyAtErrorFails(void) {
   return ok;
 }
 
-// mesmo cuidado do teste equivalente em isLowerTriangular, mas
-// usando coluna 1 (não coluna 0) pra não pisar no bug documentado
-// acima e testar só o limite de tolerância em si.
 bool test_isUpperTriangular_offDiagonalExactlyAtErrorPasses(void) {
   Matrix* a = matrix_new(3, 3);
   matrix_setIdentity(a);
