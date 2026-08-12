@@ -1,5 +1,5 @@
 #!/bin/bash
 cc=${2:-gcc}
-"$cc" -Wall -fsanitize=address,undefined -Wextra -Werror -pedantic -Wconversion -Wstrict-prototypes -std=c99 -O2 "$1" -o output
+"$cc" -Wall -fsanitize=address,undefined -Wextra -Werror -pedantic -Wconversion -Wstrict-prototypes -std=c99 -O2 "$1" -o output -lm
 ./output
 rm output

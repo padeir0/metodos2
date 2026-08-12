@@ -140,6 +140,73 @@ void matrix_free(Matrix** m) {
   *m = NULL;
 }
 
+static inline
+void matrix_copy(const Matrix* source, Matrix* dest) {
+  #if DEBUG
+    assert(source != NULL); assert(dest != NULL);
+    assert(matrix_sameShape(source, dest));
+  #endif
+
+  size_t length = matrix_length(source);
+  size_t i = 0;
+  while (i < length) {
+    dest->data[i] = source->data[i];
+    i++;
+  }
+}
+
+static inline
+Matrix* matrix_newCopy(const Matrix* source) {
+  #if DEBUG
+    assert(source != NULL);
+  #endif
+  Matrix* dest = matrix_new(source->rows, source->columns);
+  matrix_copy(source, dest);
+  return dest;
+}
+
+static inline
+void matrix_swapRows(Matrix* A, int row1, int row2) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(row1 < A->rows);
+    assert(row2 < A->rows);
+  #endif
+  double value1 = 0;
+  double value2 = 0;
+  int column = 0;
+  while (column < A->columns) {
+    value1 = matrix_at(A, row1, column);
+    value2 = matrix_at(A, row2, column);
+    matrix_setAt(A, row2, column, value1);
+    matrix_setAt(A, row1, column, value2);
+    column++;
+  }
+}
+
+/* Implements the elementary operation 'A_i <- A_i + m * A_j'
+   where 'A_i' means ith row of A and `m` is a scalar value.
+*/
+static inline
+void matrix_rowMultAdd(Matrix* A, int row_i, int row_j, double multiple) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(row_i < A->rows);
+    assert(row_j < A->rows);
+    assert(multiple != NAN); // fuck NaNs!
+  #endif
+
+  int k = 0;
+  while (k < A->columns) {
+    double a_ik = matrix_at(A, row_i, k);
+    double a_jk = matrix_at(A, row_j, k);
+
+    double value = a_ik + multiple * a_jk;
+    matrix_setAt(A, row_i, k, value);
+    k++;
+  }
+}
+
 // C = A + B; requer que A, B e C tenham as mesmas dimensões. Não aloca.
 //
 // A, B e C podem ser aliased livremente entre si, inclusive

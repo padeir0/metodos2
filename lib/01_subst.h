@@ -136,7 +136,7 @@ bool matrix_solveBySubstitution(const Matrix* A, Matrix* X, const Matrix* B, dou
 }
 
 static inline
-bool matrix_verifySolution(const Matrix* A, Matrix* X, const Matrix* B, double error) {
+bool matrix_verifySolution(const Matrix* A, const Matrix* X, const Matrix* B, double error) {
   Matrix* result = matrix_new(B->rows, B->columns);
   matrix_mult(A, X, result);
   bool ok = matrix_equals(result, B, error);
