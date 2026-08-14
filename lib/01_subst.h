@@ -10,7 +10,6 @@ bool matrix_isLowerTriangular(const Matrix* A, double error) {
   #if DEBUG
     assert(A != NULL);
     assert(error >= 0);
-    assert(A->columns == A->rows); // must be square
   #endif
   if (A->rows != A->columns) {
     return false;

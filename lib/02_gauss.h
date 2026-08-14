@@ -7,6 +7,7 @@
 #ifndef M2_GAUSS_H
 #define M2_GAUSS_H
 
+static inline
 int i_matrix_findFirstNonNullRow(const Matrix* A, int row_start, int column, double error) {
   int row = row_start;
   while (row < A->rows) {
@@ -22,6 +23,7 @@ int i_matrix_findFirstNonNullRow(const Matrix* A, int row_start, int column, dou
 /* Here "sq" means "square" because this expects a square matrix.
    This function modifies both of it's pointer operands.
 */
+static inline
 bool matrix_sqGaussianElimination(Matrix* A, Matrix* B, double error) {
   #if DEBUG
     assert(A != NULL);

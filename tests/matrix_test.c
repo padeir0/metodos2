@@ -75,6 +75,189 @@ bool test_free_setsNullAndIsIdempotent(void) {
 }
 /* END: testing matrix_new / matrix_free */
 
+/* BEGIN: testing matrix_copy */
+bool test_copy_basic(void) {
+  Matrix* source = matrix_new(2, 3);
+  Matrix* dest = matrix_new(2, 3);
+  fillMatrix(source, 1.0); // [[1,2,3],[4,5,6]]
+
+  matrix_copy(source, dest);
+  double expected[] = {1, 2, 3, 4, 5, 6};
+  bool ok = expectMatrix(dest, expected, 1e-9);
+
+  matrix_free(&source);
+  matrix_free(&dest);
+  return ok;
+}
+
+// depois de copiar, mexer em `dest` não deve afetar `source` --
+// matrix_copy copia célula a célula pra um buffer independente.
+bool test_copy_independentBuffers(void) {
+  Matrix* source = matrix_new(2, 2);
+  Matrix* dest = matrix_new(2, 2);
+  fillMatrix(source, 1.0); // [[1,2],[3,4]]
+
+  matrix_copy(source, dest);
+  matrix_setAt(dest, 0, 0, 999.0);
+
+  double expectedSource[] = {1, 2, 3, 4};
+  bool ok = expectMatrix(source, expectedSource, 1e-9) &&
+            closeEnough(matrix_at(dest, 0, 0), 999.0, 1e-9);
+
+  matrix_free(&source);
+  matrix_free(&dest);
+  return ok;
+}
+/* END: testing matrix_copy */
+
+/* BEGIN: testing matrix_newCopy */
+bool test_newCopy_matchesSourceShapeAndValues(void) {
+  Matrix* source = matrix_new(3, 2);
+  fillMatrix(source, -1.0); // [[-1,0],[1,2],[3,4]]
+
+  Matrix* dest = matrix_newCopy(source);
+  double expected[] = {-1, 0, 1, 2, 3, 4};
+  bool ok = dest != NULL && dest->rows == 3 && dest->columns == 2 &&
+            expectMatrix(dest, expected, 1e-9);
+
+  matrix_free(&source);
+  matrix_free(&dest);
+  return ok;
+}
+
+// buffer independente do original: mexer no source depois de copiar
+// não deve vazar pra dest (mesma garantia que matrix_copy, mas com
+// alocação própria).
+bool test_newCopy_independentFromSource(void) {
+  Matrix* source = matrix_new(2, 2);
+  fillMatrix(source, 1.0); // [[1,2],[3,4]]
+
+  Matrix* dest = matrix_newCopy(source);
+  matrix_setAt(source, 1, 1, -50.0);
+
+  double expectedDest[] = {1, 2, 3, 4};
+  bool ok = expectMatrix(dest, expectedDest, 1e-9);
+
+  matrix_free(&source);
+  matrix_free(&dest);
+  return ok;
+}
+/* END: testing matrix_newCopy */
+
+/* BEGIN: testing matrix_swapRows */
+bool test_swapRows_basic(void) {
+  Matrix* a = matrix_new(3, 2);
+  double vals[] = {
+    1, 2,
+    3, 4,
+    5, 6,
+  };
+  matrix_set(vals, 3, 2, a);
+
+  matrix_swapRows(a, 0, 2);
+  double expected[] = {
+    5, 6,
+    3, 4,
+    1, 2,
+  };
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// trocar uma linha com ela mesma é um no-op.
+bool test_swapRows_sameRowIsNoOp(void) {
+  Matrix* a = matrix_new(2, 2);
+  fillMatrix(a, 1.0); // [[1,2],[3,4]]
+
+  matrix_swapRows(a, 1, 1);
+  double expected[] = {1, 2, 3, 4};
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// vetor coluna: mesmo formato usado pra trocar linhas de B durante
+// a eliminação gaussiana.
+bool test_swapRows_columnVector(void) {
+  Matrix* b = matrix_new(3, 1);
+  double vals[] = {10, 20, 30};
+  matrix_set(vals, 3, 1, b);
+
+  matrix_swapRows(b, 0, 1);
+  double expected[] = {20, 10, 30};
+  bool ok = expectMatrix(b, expected, 1e-9);
+
+  matrix_free(&b);
+  return ok;
+}
+/* END: testing matrix_swapRows */
+
+/* BEGIN: testing matrix_rowMultAdd */
+bool test_rowMultAdd_basic(void) {
+  Matrix* a = matrix_new(2, 3);
+  double vals[] = {
+    1, 2, 3,
+    10, 10, 10,
+  };
+  matrix_set(vals, 2, 3, a);
+
+  matrix_rowMultAdd(a, 1, 0, 2.0); // row1 <- row1 + 2*row0
+  double expected[] = {
+    1, 2, 3,
+    12, 14, 16,
+  };
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// multiple == 0: no-op.
+bool test_rowMultAdd_zeroMultipleIsNoOp(void) {
+  Matrix* a = matrix_new(2, 2);
+  fillMatrix(a, 1.0); // [[1,2],[3,4]]
+
+  matrix_rowMultAdd(a, 0, 1, 0.0);
+  double expected[] = {1, 2, 3, 4};
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// row_i == row_j: A_i <- A_i + multiple*A_i = (1+multiple)*A_i.
+// multiple = -1 zera a linha.
+bool test_rowMultAdd_selfRowNegativeOneZeroesRow(void) {
+  Matrix* a = matrix_new(2, 2);
+  fillMatrix(a, 1.0); // [[1,2],[3,4]]
+
+  matrix_rowMultAdd(a, 1, 1, -1.0);
+  double expected[] = {1, 2, 0, 0};
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// vetor coluna: mesmo formato usado pra atualizar B durante a
+// eliminação gaussiana.
+bool test_rowMultAdd_columnVector(void) {
+  Matrix* b = matrix_new(3, 1);
+  double vals[] = {5, 2, 100};
+  matrix_set(vals, 3, 1, b);
+
+  matrix_rowMultAdd(b, 2, 0, -3.0); // row2 <- row2 + (-3)*row0
+  double expected[] = {5, 2, 85}; // 100 + (-3)*5 = 85
+  bool ok = expectMatrix(b, expected, 1e-9);
+
+  matrix_free(&b);
+  return ok;
+}
+/* END: testing matrix_rowMultAdd */
+
 /* BEGIN: testing matrix_set */
 bool test_set_copiesDataWithoutResizing(void) {
   Matrix* m = matrix_new(2, 2);
@@ -638,6 +821,21 @@ Tester tests[] = {
 
   {"test_new_zeroInitialized", test_new_zeroInitialized},
   {"test_free_setsNullAndIsIdempotent", test_free_setsNullAndIsIdempotent},
+
+  {"test_copy_basic", test_copy_basic},
+  {"test_copy_independentBuffers", test_copy_independentBuffers},
+
+  {"test_newCopy_matchesSourceShapeAndValues", test_newCopy_matchesSourceShapeAndValues},
+  {"test_newCopy_independentFromSource", test_newCopy_independentFromSource},
+
+  {"test_swapRows_basic", test_swapRows_basic},
+  {"test_swapRows_sameRowIsNoOp", test_swapRows_sameRowIsNoOp},
+  {"test_swapRows_columnVector", test_swapRows_columnVector},
+
+  {"test_rowMultAdd_basic", test_rowMultAdd_basic},
+  {"test_rowMultAdd_zeroMultipleIsNoOp", test_rowMultAdd_zeroMultipleIsNoOp},
+  {"test_rowMultAdd_selfRowNegativeOneZeroesRow", test_rowMultAdd_selfRowNegativeOneZeroesRow},
+  {"test_rowMultAdd_columnVector", test_rowMultAdd_columnVector},
 
   {"test_set_copiesDataWithoutResizing", test_set_copiesDataWithoutResizing},
   {"test_set_growsAndUpdatesShape", test_set_growsAndUpdatesShape},
