@@ -80,10 +80,10 @@ Matrix* i_matrix_createMaxArray(Matrix* A) {
 
   i = 0;
   while (i < A->rows) {
-    double largest = DBL_MIN;
+    double largest = 0;
     j = 0;
     while (j < A->columns) {
-      double value = matrix_at(A, i, j);
+      double value = fabs(matrix_at(A, i, j));
       if (largest < value) {
         largest = value;
       }
