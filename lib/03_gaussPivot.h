@@ -13,10 +13,10 @@
 */
 static inline
 int i_matrix_findLargestRow(const Matrix* A, int row_start, int column, double error) {
-  int row = row_start;
   // usamos apenas valores em módulo, o minimo é zero
   double largest = 0;
   int selected = row_start;
+  int row = row_start;
   while (row < A->rows) {
     double value = fabs(matrix_at(A, row, column));
     if (largest < value) {
@@ -56,8 +56,8 @@ bool matrix_sqGaussianEliminationPivot_1(Matrix* A, Matrix* B, double error) {
     matrix_swapRows(A, k, bestRow);
     matrix_swapRows(B, k, bestRow);
 
-    int i = k+1;
     double a_kk = matrix_at(A, k, k);
+    int i = k+1;
     while (i < A->rows) {
       double multiple = -(matrix_at(A, i, k) / a_kk);
       matrix_rowMultAdd(A, i, k, multiple);
@@ -73,13 +73,15 @@ bool matrix_sqGaussianEliminationPivot_1(Matrix* A, Matrix* B, double error) {
 */
 static inline
 Matrix* i_matrix_createMaxArray(Matrix* A) {
-  int i = 0;
-  int j = 0;
+  int i;
+  int j;
 
   Matrix* out = matrix_new(A->rows, 1);
 
+  i = 0;
   while (i < A->rows) {
     double largest = DBL_MIN;
+    j = 0;
     while (j < A->columns) {
       double value = matrix_at(A, i, j);
       if (largest < value) {
@@ -95,11 +97,11 @@ Matrix* i_matrix_createMaxArray(Matrix* A) {
 
 static inline
 int i_matrix_findLargestRelativeRow(const Matrix* A, const Matrix* maxMatrix, int row_start, int column, double error) {
-  int row = row_start;
   int selected = row_start;
   // R só assume valores positivos, então o mínimo é 0
   double largestR = 0;
 
+  int row = row_start;
   while (row < A->rows) {
     double a_ik = matrix_at(A, row, column);
     double s_i = matrix_at(maxMatrix, row, 0);
@@ -143,6 +145,7 @@ bool matrix_sqGaussianEliminationPivot_2(Matrix* A, Matrix* B, double error) {
 
     matrix_swapRows(A, k, bestRow);
     matrix_swapRows(B, k, bestRow);
+    matrix_swapRows(maxMatrix, k, bestRow);
 
     int i = k+1;
     double a_kk = matrix_at(A, k, k);
