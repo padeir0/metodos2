@@ -72,7 +72,7 @@ bool matrix_sqGaussianEliminationPivot_1(Matrix* A, Matrix* B, double error) {
 /* Returns a vector (Nx1 matrix) containing the largest element of each row.
 */
 static inline
-Matrix* i_matrix_createMaxArray(Matrix* A) {
+Matrix* i_matrix_createMaxArray(const Matrix* A) {
   int i;
   int j;
 
