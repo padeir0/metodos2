@@ -29,22 +29,30 @@ int i_matrix_index(const Matrix* m, int row, int col) {
 }
 
 static inline
-double matrix_at(const Matrix* m, int row, int col) {
-  return m->data[i_matrix_index(m, row, col)];
-}
-
-static inline
-void matrix_setAt(Matrix* m, int row, int col, double value) {
-  m->data[i_matrix_index(m, row, col)] = value;
-}
-
-static inline
 size_t matrix_length(const Matrix* m) {
   #if DEBUG
     assert(m->rows > 0);
     assert(m->columns > 0);
   #endif
   return (size_t)m->rows * (size_t)m->columns;
+}
+
+static inline
+double matrix_at(const Matrix* m, int row, int col) {
+  int index = i_matrix_index(m, row, col);
+  #if DEBUG
+    assert(index < (int)matrix_length(m));
+  #endif
+  return m->data[index];
+}
+
+static inline
+void matrix_setAt(Matrix* m, int row, int col, double value) {
+  int index = i_matrix_index(m, row, col);
+  #if DEBUG
+    assert(index < (int)matrix_length(m));
+  #endif
+  m->data[index] = value;
 }
 
 static inline
@@ -390,7 +398,9 @@ bool matrix_equals(const Matrix* A, const Matrix* B, double error) {
   while (i < rows) {
     j = 0;
     while (j < columns) {
-      if (fabs(matrix_at(A, i, j) - matrix_at(B, i, j)) > error) {
+      double a_ij = matrix_at(A, i, j);
+      double b_ij = matrix_at(B, i, j);
+      if (fabs(a_ij - b_ij) > error || a_ij == NAN || b_ij == NAN) {
         return false;
       }
       j++;
