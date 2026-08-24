@@ -399,6 +399,31 @@ bool matrix_equals(const Matrix* A, const Matrix* B, double error) {
   }
   return true;
 }
+
+/* implementa a norma de frobenius ao quadrado */
+double matrix_normSquared(const Matrix* X) {
+  #if DEBUG
+    assert(X != NULL);
+  #endif
+
+  double out = 0;
+
+  int i = 0;
+  int j = 0;
+  while (i < X->rows) {
+    j = 0;
+    while (j < X->columns) {
+      double value = matrix_at(X, i, j);
+      out += value * value;
+      j++;
+    }
+    i++;
+  }
+
+  return out;
+}
+
+
 /* BEGIN: SNPRINT */
 
 // Retorna a maior largura, em caracteres, dentre as células de `A`
