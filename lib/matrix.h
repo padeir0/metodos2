@@ -173,6 +173,54 @@ Matrix* matrix_newCopy(const Matrix* source) {
   return dest;
 }
 
+/* Copia um bloco da matriz `A` para um bloco da matriz `out` */
+static inline
+void matrix_copyBlock(const Matrix* A, int in_row_start, int in_row_end, int in_column_start, int in_column_end,
+                     Matrix* out, int out_row_start, int out_row_end, int out_column_start, int out_column_end) {
+  #if DEBUG
+    assert(in_row_start >= 0 && in_row_start <= A->rows);
+    assert(in_row_end >= 0   && in_row_end <= A->rows);
+    assert(in_column_start >= 0 && in_column_start <= A->columns);
+    assert(in_column_end >= 0   && in_column_end <= A->columns);
+
+    assert(out_row_start >= 0 && out_row_start <= out->rows);
+    assert(out_row_end >= 0   && out_row_end <= out->rows);
+    assert(out_column_start >= 0 && out_column_start <= out->columns);
+    assert(out_column_end >= 0   && out_column_end <= out->columns);
+
+    assert(in_row_end-in_row_start == out_row_end-out_row_start);
+    assert(in_column_end-in_column_start == out_column_end-out_column_start);
+  #endif
+
+  int row_len = in_row_end-in_row_start;
+  int column_len = in_column_end-in_column_start;
+  
+  int i = 0;
+  while (i < row_len) {
+    int j = 0;
+    while (j < column_len) {
+      double value = matrix_at(A, in_row_start+i, in_column_start+j);
+      matrix_setAt(out, out_row_start+i, out_column_start+j, value);
+      j++;
+    }
+    i++;
+  }
+}
+
+static inline
+Matrix* matrix_append(const Matrix* A, const Matrix* B) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(B != NULL);
+  #endif
+  Matrix* AB = matrix_new(A->rows, A->columns + B->columns);
+  matrix_copyBlock(A, 0, A->rows, 0, A->columns,
+                   AB, 0, A->rows, 0, A->columns);
+  matrix_copyBlock(B, 0, B->rows, 0, B->columns,
+                   AB, 0, A->rows, A->columns, A->columns+B->columns);
+  return AB;
+}
+
 static inline
 void matrix_swapRows(Matrix* A, int row1, int row2) {
   #if DEBUG
@@ -195,6 +243,23 @@ void matrix_swapRows(Matrix* A, int row1, int row2) {
 /* Implements the elementary operation 'A_i <- A_i + m * A_j'
    where 'A_i' means ith row of A and `m` is a scalar value.
 */
+static inline
+void matrix_rowMult(Matrix* A, int row_i, double multiple) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(row_i < A->rows);
+    assert(multiple != NAN); // fuck NaNs!
+  #endif
+
+  int k = 0;
+  while (k < A->columns) {
+    double a_ik = matrix_at(A, row_i, k);
+    double value = a_ik * multiple;
+    matrix_setAt(A, row_i, k, value);
+    k++;
+  }
+}
+
 static inline
 void matrix_rowMultAdd(Matrix* A, int row_i, int row_j, double multiple) {
   #if DEBUG
