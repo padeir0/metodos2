@@ -41,6 +41,41 @@ bool matrix_NaiveLUDecomposition(const Matrix* A, Matrix* L, Matrix* U, double e
 }
 
 static inline
+bool matrix_NaiveLDLDecomposition(Matrix* A, Matrix* L, Matrix* D, double error) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(L != NULL);
+    assert(D != NULL);
+    assert(A->columns == A->rows);
+    assert(matrix_sameShape(A, L));
+    assert(matrix_sameShape(A, D));
+  #endif
+
+  matrix_setIdentity(L);
+  matrix_setIdentity(D);
+
+  int k = 0;
+  while (k < A->rows) {
+    double a_kk = matrix_at(A, k, k);
+    if (fabs(a_kk - 0) < error) {
+      // não fazemos pivotamento
+      return false;
+    }
+    matrix_setAt(D, k, k, a_kk);    
+
+    int i = k+1;
+    while (i < A->rows) {
+      double multiple = matrix_at(A, i, k) / a_kk;
+      matrix_rowMultAdd(A, i, k, -multiple);
+      matrix_setAt(L, i, k, multiple);
+      i++;
+    }
+    k++;
+  }
+  return true;
+}
+
+static inline
 int i_matrix_findLargestRow(const Matrix* A, int row_start, int column, double error) {
   // usamos apenas valores em módulo, o minimo é zero
   double largest = 0;

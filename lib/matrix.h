@@ -176,7 +176,7 @@ Matrix* matrix_newCopy(const Matrix* source) {
 /* Copia um bloco da matriz `A` para um bloco da matriz `out` */
 static inline
 void matrix_copyBlock(const Matrix* A, int in_row_start, int in_row_end, int in_column_start, int in_column_end,
-                     Matrix* out, int out_row_start, int out_row_end, int out_column_start, int out_column_end) {
+                      Matrix* out, int out_row_start, int out_row_end, int out_column_start, int out_column_end) {
   #if DEBUG
     assert(in_row_start >= 0 && in_row_start <= A->rows);
     assert(in_row_end >= 0   && in_row_end <= A->rows);
