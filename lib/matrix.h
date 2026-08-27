@@ -221,6 +221,7 @@ Matrix* matrix_append(const Matrix* A, const Matrix* B) {
   return AB;
 }
 
+/* swap two rows in the matrix */
 static inline
 void matrix_swapRows(Matrix* A, int row1, int row2) {
   #if DEBUG
@@ -232,6 +233,27 @@ void matrix_swapRows(Matrix* A, int row1, int row2) {
   double value2 = 0;
   int column = 0;
   while (column < A->columns) {
+    value1 = matrix_at(A, row1, column);
+    value2 = matrix_at(A, row2, column);
+    matrix_setAt(A, row2, column, value1);
+    matrix_setAt(A, row1, column, value2);
+    column++;
+  }
+}
+
+/* swap two rows in the matrix up to the specified column */
+static inline
+void matrix_partialSwapRows(Matrix* A, int row1, int row2, int end_col) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(row1 < A->rows);
+    assert(row2 < A->rows);
+    assert(0 <= end_col && end_col < A->columns);
+  #endif
+  double value1 = 0;
+  double value2 = 0;
+  int column = 0;
+  while (column < end_col) {
     value1 = matrix_at(A, row1, column);
     value2 = matrix_at(A, row2, column);
     matrix_setAt(A, row2, column, value1);
