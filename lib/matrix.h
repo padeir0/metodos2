@@ -120,6 +120,17 @@ bool matrix_set(double* data, int rows, int columns, Matrix* m) {
 }
 
 static inline
+bool matrix_setAll(Matrix* m, double value) {
+  size_t len = matrix_length(m);
+  size_t i = 0;
+  while (i < len) {
+    m->data[i] = value;
+    i++;
+  }
+  return m;
+}
+
+static inline
 void matrix_setIdentity(Matrix* m) {
   #if DEBUG
     assert(m->rows == m->columns);
@@ -463,38 +474,33 @@ void matrix_transpose(const Matrix* A, Matrix* C) {
     i++;
   }
 }
-
-static inline
-bool matrix_equals(const Matrix* A, const Matrix* B, double error) {
+/* computa a distância entre duas matrizes usando a norma 
+de frobenius (não usa a função matrix_normSquared pra evitar
+alocação)*/
+double matrix_distanceSquared(const Matrix* A, const Matrix* B) {
   #if DEBUG
     assert(A != NULL);
     assert(B != NULL);
-    assert(error >= 0);
+    assert(matrix_sameShape(A, B));
   #endif
-
-  if (matrix_sameShape(A, B) == false) {
-    return false;
-  }
-
   int rows = A->rows;
-  int columns = A->columns;
-  int i;
-  int j;
-  
-  i = 0;
+  int cols = A->columns;
+
+  double out = 0;
+
+  int i = 0;
+  int j = 0;
   while (i < rows) {
     j = 0;
-    while (j < columns) {
-      double a_ij = matrix_at(A, i, j);
-      double b_ij = matrix_at(B, i, j);
-      if (fabs(a_ij - b_ij) > error || a_ij == NAN || b_ij == NAN) {
-        return false;
-      }
+    while (j < cols) {
+      double value = matrix_at(A, i, j) - matrix_at(B, i, j);
+      out += value * value;
       j++;
     }
     i++;
   }
-  return true;
+
+  return out;
 }
 
 /* implementa a norma de frobenius ao quadrado */
@@ -520,6 +526,19 @@ double matrix_normSquared(const Matrix* X) {
   return out;
 }
 
+static inline
+bool matrix_equals(const Matrix* A, const Matrix* B, double error) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(B != NULL);
+    assert(error >= 0);
+  #endif
+
+  if (matrix_sameShape(A, B) == false) {
+    return false;
+  }
+  return matrix_distanceSquared(A, B) <= error*error;
+}
 
 /* BEGIN: SNPRINT */
 
