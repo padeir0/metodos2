@@ -41,9 +41,9 @@ int main(void) {
   printf("vetor B:\n");
   matrix_print(B, 2);
 
-  int iter = matrix_jacobi(A, B, X, MAXITER, ERROR);
+  int iter = matrix_gaussSeidel(A, B, X, MAXITER, ERROR);
   if (iter == MAXITER) {
-    printf("Método de Jacobi não convergiu!\n");
+    printf("Método de Gauss-Seidel não convergiu!\n");
     printf("matriz X:\n");
     matrix_print(X, 2);
     abort();

@@ -27,8 +27,6 @@ void createLinearSystem(Matrix* A, Matrix* X, Matrix* B) {
   int i;
   int j;
 
-  // matriz A é aleatoria mas determinista
-  srand(27);
   i = 0;
   while (i < A->rows) {
     j = 0;
