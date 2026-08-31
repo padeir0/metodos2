@@ -144,6 +144,94 @@ bool test_newCopy_independentFromSource(void) {
 }
 /* END: testing matrix_newCopy */
 
+/* BEGIN: testing matrix_copyBlock */
+bool test_copyBlock_basicSubBlock(void) {
+  Matrix* a = matrix_new(3, 3);
+  fillMatrix(a, 1.0); // [[1,2,3],[4,5,6],[7,8,9]]
+  Matrix* out = matrix_new(2, 2);
+
+  matrix_copyBlock(a, 0, 2, 1, 3, out, 0, 2, 0, 2);
+  double expected[] = {2, 3, 5, 6};
+  bool ok = expectMatrix(out, expected, 1e-9);
+
+  matrix_free(&a);
+  matrix_free(&out);
+  return ok;
+}
+
+// copia pra um bloco DESLOCADO dentro de uma matriz de saída maior --
+// só a região destino é escrita, o resto continua zerado.
+bool test_copyBlock_intoOffsetDestination(void) {
+  Matrix* a = matrix_new(2, 2);
+  double avals[] = {
+    9, 8,
+    7, 6,
+  };
+  matrix_set(avals, 2, 2, a);
+  Matrix* out = matrix_new(3, 3); // zero-initializado por matrix_new
+
+  matrix_copyBlock(a, 0, 2, 0, 2, out, 1, 3, 1, 3);
+  double expected[] = {
+    0, 0, 0,
+    0, 9, 8,
+    0, 7, 6,
+  };
+  bool ok = expectMatrix(out, expected, 1e-9);
+
+  matrix_free(&a);
+  matrix_free(&out);
+  return ok;
+}
+/* END: testing matrix_copyBlock */
+
+/* BEGIN: testing matrix_append */
+bool test_append_basic(void) {
+  Matrix* a = matrix_new(2, 2);
+  double avals[] = {
+    1, 2,
+    3, 4,
+  };
+  matrix_set(avals, 2, 2, a);
+  Matrix* b = matrix_new(2, 1);
+  double bvals[] = {9, 8};
+  matrix_set(bvals, 2, 1, b);
+
+  Matrix* ab = matrix_append(a, b);
+  double expected[] = {
+    1, 2, 9,
+    3, 4, 8,
+  };
+  bool ok = ab != NULL && ab->rows == 2 && ab->columns == 3 &&
+            expectMatrix(ab, expected, 1e-9);
+
+  matrix_free(&a);
+  matrix_free(&b);
+  matrix_free(&ab);
+  return ok;
+}
+
+// resultado é um buffer independente: mexer em AB não deve afetar A nem B.
+bool test_append_independentFromInputs(void) {
+  Matrix* a = matrix_new(1, 2);
+  double avals[] = {1, 2};
+  matrix_set(avals, 1, 2, a);
+  Matrix* b = matrix_new(1, 1);
+  matrix_setAt(b, 0, 0, 3.0);
+
+  Matrix* ab = matrix_append(a, b);
+  matrix_setAt(ab, 0, 0, 999.0);
+
+  double expectedA[] = {1, 2};
+  double expectedB[] = {3};
+  bool ok = expectMatrix(a, expectedA, 1e-9) && expectMatrix(b, expectedB, 1e-9);
+
+  matrix_free(&a);
+  matrix_free(&b);
+  matrix_free(&ab);
+  return ok;
+}
+/* END: testing matrix_append */
+
 /* BEGIN: testing matrix_swapRows */
 bool test_swapRows_basic(void) {
   Matrix* a = matrix_new(3, 2);
@@ -194,6 +282,108 @@ bool test_swapRows_columnVector(void) {
   return ok;
 }
 /* END: testing matrix_swapRows */
+
+/* BEGIN: testing matrix_partialSwapRows */
+bool test_partialSwapRows_swapsOnlyUpToEndCol(void) {
+  Matrix* a = matrix_new(2, 3);
+  double vals[] = {
+    1, 2, 3,
+    4, 5, 6,
+  };
+  matrix_set(vals, 2, 3, a);
+
+  matrix_partialSwapRows(a, 0, 1, 1); // só a coluna 0
+  double expected[] = {
+    4, 2, 3,
+    1, 5, 6,
+  };
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// end_col == 0: nenhuma coluna é trocada, matriz permanece igual.
+bool test_partialSwapRows_zeroEndColIsNoOp(void) {
+  Matrix* a = matrix_new(2, 2);
+  fillMatrix(a, 1.0); // [[1,2],[3,4]]
+
+  matrix_partialSwapRows(a, 0, 1, 0);
+  double expected[] = {1, 2, 3, 4};
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// end_col == columns-1 (limite permitido pelo assert): troca todas as
+// colunas MENOS a última, que fica intocada.
+bool test_partialSwapRows_lastColumnUntouched(void) {
+  Matrix* a = matrix_new(2, 3);
+  double vals[] = {
+    1, 2, 3,
+    4, 5, 6,
+  };
+  matrix_set(vals, 2, 3, a);
+
+  matrix_partialSwapRows(a, 0, 1, 2); // troca colunas 0 e 1, deixa a 2
+  double expected[] = {
+    4, 5, 3,
+    1, 2, 6,
+  };
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+/* END: testing matrix_partialSwapRows */
+
+/* BEGIN: testing matrix_rowMult */
+bool test_rowMult_basic(void) {
+  Matrix* a = matrix_new(2, 3);
+  double vals[] = {
+    1, 2, 3,
+    4, 5, 6,
+  };
+  matrix_set(vals, 2, 3, a);
+
+  matrix_rowMult(a, 1, 2.0); // row1 <- 2*row1
+  double expected[] = {
+    1, 2, 3,
+    8, 10, 12,
+  };
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// multiple == 0: zera a linha inteira.
+bool test_rowMult_byZeroZeroesRow(void) {
+  Matrix* a = matrix_new(2, 2);
+  fillMatrix(a, 1.0); // [[1,2],[3,4]]
+
+  matrix_rowMult(a, 0, 0.0);
+  double expected[] = {0, 0, 3, 4};
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// multiple == 1: no-op.
+bool test_rowMult_byOneIsNoOp(void) {
+  Matrix* a = matrix_new(2, 2);
+  fillMatrix(a, 1.0);
+
+  matrix_rowMult(a, 1, 1.0);
+  double expected[] = {1, 2, 3, 4};
+  bool ok = expectMatrix(a, expected, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+/* END: testing matrix_rowMult */
 
 /* BEGIN: testing matrix_rowMultAdd */
 bool test_rowMultAdd_basic(void) {
@@ -372,6 +562,60 @@ bool test_equals_justAboveToleranceFails(void) {
   return ok;
 }
 /* END: testing matrix_equals */
+
+/* BEGIN: testing matrix_normSquared */
+bool test_normSquared_basic(void) {
+  Matrix* a = matrix_new(2, 2);
+  double vals[] = {
+    3, 4,
+    0, 0,
+  };
+  matrix_set(vals, 2, 2, a);
+
+  double n = matrix_normSquared(a);
+  bool ok = closeEnough(n, 25.0, 1e-9); // 3^2+4^2 = 25
+
+  matrix_free(&a);
+  return ok;
+}
+
+// matriz nula (zero-initializada por matrix_new) tem norma zero.
+bool test_normSquared_zeroMatrixIsZero(void) {
+  Matrix* a = matrix_new(3, 2);
+
+  double n = matrix_normSquared(a);
+  bool ok = closeEnough(n, 0.0, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// valores negativos contam positivamente, é uma soma de quadrados.
+bool test_normSquared_negativeValuesCountPositively(void) {
+  Matrix* a = matrix_new(1, 2);
+  double vals[] = {-3, -4};
+  matrix_set(vals, 1, 2, a);
+
+  double n = matrix_normSquared(a);
+  bool ok = closeEnough(n, 25.0, 1e-9);
+
+  matrix_free(&a);
+  return ok;
+}
+
+// vetor coluna, pra confirmar que não depende da matriz ser quadrada.
+bool test_normSquared_columnVector(void) {
+  Matrix* a = matrix_new(3, 1);
+  double vals[] = {1, 2, 2};
+  matrix_set(vals, 3, 1, a);
+
+  double n = matrix_normSquared(a);
+  bool ok = closeEnough(n, 9.0, 1e-9); // 1+4+4=9
+
+  matrix_free(&a);
+  return ok;
+}
+/* END: testing matrix_normSquared */
 
 /* BEGIN: testing matrix_add */
 bool test_add_basic(void) {
@@ -828,9 +1072,23 @@ Tester tests[] = {
   {"test_newCopy_matchesSourceShapeAndValues", test_newCopy_matchesSourceShapeAndValues},
   {"test_newCopy_independentFromSource", test_newCopy_independentFromSource},
 
+  {"test_copyBlock_basicSubBlock", test_copyBlock_basicSubBlock},
+  {"test_copyBlock_intoOffsetDestination", test_copyBlock_intoOffsetDestination},
+
+  {"test_append_basic", test_append_basic},
+  {"test_append_independentFromInputs", test_append_independentFromInputs},
+
   {"test_swapRows_basic", test_swapRows_basic},
   {"test_swapRows_sameRowIsNoOp", test_swapRows_sameRowIsNoOp},
   {"test_swapRows_columnVector", test_swapRows_columnVector},
+
+  {"test_partialSwapRows_swapsOnlyUpToEndCol", test_partialSwapRows_swapsOnlyUpToEndCol},
+  {"test_partialSwapRows_zeroEndColIsNoOp", test_partialSwapRows_zeroEndColIsNoOp},
+  {"test_partialSwapRows_lastColumnUntouched", test_partialSwapRows_lastColumnUntouched},
+
+  {"test_rowMult_basic", test_rowMult_basic},
+  {"test_rowMult_byZeroZeroesRow", test_rowMult_byZeroZeroesRow},
+  {"test_rowMult_byOneIsNoOp", test_rowMult_byOneIsNoOp},
 
   {"test_rowMultAdd_basic", test_rowMultAdd_basic},
   {"test_rowMultAdd_zeroMultipleIsNoOp", test_rowMultAdd_zeroMultipleIsNoOp},
@@ -847,6 +1105,11 @@ Tester tests[] = {
   {"test_equals_falseForDifferentShape", test_equals_falseForDifferentShape},
   {"test_equals_toleranceBoundaryPasses", test_equals_toleranceBoundaryPasses},
   {"test_equals_justAboveToleranceFails", test_equals_justAboveToleranceFails},
+
+  {"test_normSquared_basic", test_normSquared_basic},
+  {"test_normSquared_zeroMatrixIsZero", test_normSquared_zeroMatrixIsZero},
+  {"test_normSquared_negativeValuesCountPositively", test_normSquared_negativeValuesCountPositively},
+  {"test_normSquared_columnVector", test_normSquared_columnVector},
 
   {"test_add_basic", test_add_basic},
   {"test_add_zeroIsIdentity", test_add_zeroIsIdentity},

@@ -50,6 +50,7 @@ bool matrix_gaussJordan(Matrix* A, Matrix* B, double error) {
 
     if (bestRow == -1) {
       // the matrix is not invertible
+      matrix_free(&AB);
       return false;
     }
 
