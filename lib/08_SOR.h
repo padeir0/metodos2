@@ -16,6 +16,10 @@
 */
 int matrix_SOR(const Matrix* A, const Matrix* B, Matrix* X, int maxIter, double tolerance, double WRelax) {
   #if DEBUG
+    assert(A != NULL);
+    assert(B != NULL);
+    assert(X != NULL);
+    assert(matrix_isValidLinearSystem(A, X, B));
     assert(0 <= WRelax && WRelax < 2);
   #endif
   Matrix* NewX = matrix_new(X->rows, X->columns);

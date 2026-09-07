@@ -66,9 +66,14 @@ bool matrix_isUpperTriangular(const Matrix* A, double error) {
 static inline
 void matrix_solveUpperTriangular(const Matrix* A, Matrix* X, const Matrix* B) {
   #if DEBUG
+    assert(A != NULL);
+    assert(X != NULL);
+    assert(B != NULL);
+    assert(matrix_isSquare(A));
     assert(B->columns == 1);
     assert(B->rows == A->columns);
-    assert(A->rows == A->columns);
+    assert(X->columns == 1);
+    assert(X->rows == A->rows);
   #endif
   
   int n = A->columns - 1;
@@ -95,9 +100,14 @@ void matrix_solveUpperTriangular(const Matrix* A, Matrix* X, const Matrix* B) {
 static inline
 void matrix_solveLowerTriangular(const Matrix* A, Matrix* X, const Matrix* B) {
   #if DEBUG
+    assert(A != NULL);
+    assert(X != NULL);
+    assert(B != NULL);
+    assert(matrix_isSquare(A));
     assert(B->columns == 1);
     assert(B->rows == A->columns);
-    assert(A->rows == A->columns);
+    assert(X->columns == 1);
+    assert(X->rows == A->rows);
   #endif
   
   int n = 0;
@@ -123,6 +133,14 @@ void matrix_solveLowerTriangular(const Matrix* A, Matrix* X, const Matrix* B) {
 
 static inline
 bool matrix_solveBySubstitution(const Matrix* A, Matrix* X, const Matrix* B, double error) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(X != NULL);
+    assert(B != NULL);
+    assert(error >= 0);
+    assert(matrix_isSquare(A));
+    assert(matrix_isValidLinearSystem(A, X, B));
+  #endif
   if (matrix_isUpperTriangular(A, error)) {
     matrix_solveUpperTriangular(A, X, B);
     return true;
@@ -136,6 +154,13 @@ bool matrix_solveBySubstitution(const Matrix* A, Matrix* X, const Matrix* B, dou
 
 static inline
 bool matrix_verifySolution(const Matrix* A, const Matrix* X, const Matrix* B, double error) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(X != NULL);
+    assert(B != NULL);
+    assert(error >= 0);
+    assert(matrix_isValidLinearSystem(A, X, B));
+  #endif
   Matrix* result = matrix_new(B->rows, B->columns);
   matrix_mult(A, X, result);
   bool ok = matrix_equals(result, B, error);

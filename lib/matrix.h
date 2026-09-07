@@ -61,12 +61,24 @@ int matrix_sameShape(const Matrix* A, const Matrix* B) {
 }
 
 static inline
+bool matrix_isSquare(const Matrix* A) {
+  return A->rows == A->columns;
+}
+
+static inline
 bool matrix_isValidLinearSystem(const Matrix* A, const Matrix* X, const Matrix* B) {
   return A->columns >= 1 &&
          X->columns == 1 &&
          X->rows == A->columns &&
          B->columns == 1 &&
          B->rows == A->rows;
+}
+
+static inline
+bool matrix_isValidSquareSystem(const Matrix* A, const Matrix* B) {
+  return matrix_isSquare(A) &&
+         B->rows == A->rows &&
+         B->columns == 1;
 }
 
 /* Verifica se `A` é estritamente diagonalmente dominante por linhas:
@@ -76,7 +88,7 @@ static inline
 bool matrix_isDiagDominant(const Matrix* A) {
   #if DEBUG
     assert(A != NULL);
-    assert(A->rows == A->columns);
+    assert(matrix_isSquare(A));
   #endif
 
   int i = 0;

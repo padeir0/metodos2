@@ -29,7 +29,7 @@ int matrix_jacobi(const Matrix* A,
   Matrix* X_2 = NewX;
 
   int iter = 0;
-  while (iter < maxIter) {
+  do {
     int i = 0;
     while (i < A->rows) {
       double a_ii = matrix_at(A, i, i);
@@ -53,6 +53,9 @@ int matrix_jacobi(const Matrix* A,
         < tol*tol) {
       break;
     }
+    if (iter >= maxIter) {
+      break;
+    }
 
     { // swap
       Matrix* Z = X_1;
@@ -60,7 +63,7 @@ int matrix_jacobi(const Matrix* A,
       X_2 = Z;
     }
     iter++;
-  }
+  } while (true);
 
   if (X != X_2) {
     matrix_copy(X_2, X);
@@ -91,7 +94,7 @@ int matrix_gaussSeidel(const Matrix* A, const Matrix* B, Matrix* X, int maxIter,
   Matrix* X_2 = NewX;
 
   int iter = 0;
-  while (iter < maxIter) {
+  do {
     int i = 0;
     while (i < A->rows) {
       double a_ii = matrix_at(A, i, i);
@@ -117,6 +120,9 @@ int matrix_gaussSeidel(const Matrix* A, const Matrix* B, Matrix* X, int maxIter,
     if (matrix_distanceSquared(X_1, X_2) < tol*tol) {
       break;
     }
+    if (iter >= maxIter) {
+      break;
+    }
 
     { // swap
       Matrix* Z = X_1;
@@ -124,7 +130,7 @@ int matrix_gaussSeidel(const Matrix* A, const Matrix* B, Matrix* X, int maxIter,
       X_2 = Z;
     }
     iter++;
-  }
+  } while (true);
 
   if (X != X_2) {
     matrix_copy(X_2, X);

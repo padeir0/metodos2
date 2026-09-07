@@ -13,7 +13,7 @@ bool matrix_NaiveLUDecomposition(const Matrix* A, Matrix* L, Matrix* U, double e
     assert(A != NULL);
     assert(L != NULL);
     assert(U != NULL);
-    assert(A->columns == A->rows);
+    assert(matrix_isSquare(A));
     assert(matrix_sameShape(A, L));
     assert(matrix_sameShape(A, U));
   #endif
@@ -46,7 +46,7 @@ bool matrix_NaiveLDLDecomposition(Matrix* A, Matrix* L, Matrix* D, double error)
     assert(A != NULL);
     assert(L != NULL);
     assert(D != NULL);
-    assert(A->columns == A->rows);
+    assert(matrix_isSquare(A));
     assert(matrix_sameShape(A, L));
     assert(matrix_sameShape(A, D));
   #endif
@@ -102,9 +102,10 @@ bool matrix_PivotingLUDecomposition(const Matrix* A, Matrix* P, Matrix* L, Matri
     assert(A != NULL);
     assert(L != NULL);
     assert(U != NULL);
-    assert(A->columns == A->rows);
+    assert(matrix_isSquare(A));
     assert(matrix_sameShape(A, L));
     assert(matrix_sameShape(A, U));
+    assert(matrix_sameShape(A, P));
   #endif
 
   matrix_setIdentity(L);

@@ -35,9 +35,7 @@ bool matrix_gaussJordan(Matrix* A, Matrix* B, double error) {
   #if DEBUG
     assert(A != NULL);
     assert(B != NULL);
-    assert(A->columns == A->rows);
-    assert(B->rows == A->columns);
-    assert(B->columns == 1);
+    assert(matrix_isValidSquareSystem(A, B));
   #endif
   int i;
 

@@ -49,8 +49,8 @@ void createLinearSystem(Matrix* A, Matrix* X, Matrix* B) {
       sum += fabs(matrix_at(A, i, j));
       j++;
     }
-    /* Tomamos 1.3*sum+1 pra garantir que o sistema é ESTRITAMENTE
-       diagonal dominante. As constantes `1.3` e `1` são arbitrárias.
+    /* Tomamos 2*sum+1 pra garantir que o sistema é ESTRITAMENTE
+       diagonal dominante. As constantes `2` e `1` são arbitrárias.
     */
     matrix_setAt(A, i, i, 2*sum + 1);
 

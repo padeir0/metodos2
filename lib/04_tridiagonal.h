@@ -18,6 +18,7 @@ void matrix_solveTridiagonal(Matrix* A, Matrix* B, Matrix* C, Matrix* X, Matrix*
 
     assert(A->rows == B->rows);
     assert(B->rows == C->rows);
+    assert(C->rows == D->rows);
     assert(X->rows == D->rows);
   #endif
 

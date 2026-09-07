@@ -39,9 +39,7 @@ bool matrix_sqGaussianEliminationPivot_1(Matrix* A, Matrix* B, double error) {
   #if DEBUG
     assert(A != NULL);
     assert(B != NULL);
-    assert(A->columns == A->rows);
-    assert(B->rows == A->columns);
-    assert(B->columns == 1);
+    assert(matrix_isValidSquareSystem(A, B));
   #endif
 
   int k = 0;
@@ -127,9 +125,7 @@ bool matrix_sqGaussianEliminationPivot_2(Matrix* A, Matrix* B, double error) {
   #if DEBUG
     assert(A != NULL);
     assert(B != NULL);
-    assert(A->columns == A->rows);
-    assert(B->rows == A->columns);
-    assert(B->columns == 1);
+    assert(matrix_isValidSquareSystem(A, B));
   #endif
 
   Matrix* maxMatrix = i_matrix_createMaxArray(A);
