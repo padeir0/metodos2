@@ -60,6 +60,44 @@ int matrix_sameShape(const Matrix* A, const Matrix* B) {
   return A->rows == B->rows && A->columns == B->columns;
 }
 
+static inline
+bool matrix_isValidLinearSystem(const Matrix* A, const Matrix* X, const Matrix* B) {
+  return A->columns >= 1 &&
+         X->columns == 1 &&
+         X->rows == A->columns &&
+         B->columns == 1 &&
+         B->rows == A->rows;
+}
+
+/* Verifica se `A` é estritamente diagonalmente dominante por linhas:
+   |a_ii| > sum_{j!=i} |a_ij|, para toda linha i.
+*/
+static inline
+bool matrix_isDiagDominant(const Matrix* A) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(A->rows == A->columns);
+  #endif
+
+  int i = 0;
+  while (i < A->rows) {
+    double a_ii = fabs(matrix_at(A, i, i));
+    double sum = 0;
+    int j = 0;
+    while (j < A->columns) {
+      if (j != i) {
+        sum += fabs(matrix_at(A, i, j));
+      }
+      j++;
+    }
+    if (a_ii <= sum) {
+      return false;
+    }
+    i++;
+  }
+  return true;
+}
+
 /* Aloca uma matrix de ordem rows X columns
  * retorna NULL se a alocação falhar
 */
@@ -103,7 +141,6 @@ bool matrix_set(double* data, int rows, int columns, Matrix* m) {
     free(m->data);
     m->data = (double*)calloc(n, sizeof(double));
     if (m->data == NULL) {
-      free(m);
       return false;
     }
   }
@@ -116,18 +153,17 @@ bool matrix_set(double* data, int rows, int columns, Matrix* m) {
 
   m->rows = rows;
   m->columns = columns;
-  return m;
+  return true;
 }
 
 static inline
-bool matrix_setAll(Matrix* m, double value) {
+void matrix_setAll(Matrix* m, double value) {
   size_t len = matrix_length(m);
   size_t i = 0;
   while (i < len) {
     m->data[i] = value;
     i++;
   }
-  return m;
 }
 
 static inline
@@ -281,7 +317,7 @@ void matrix_rowMult(Matrix* A, int row_i, double multiple) {
   #if DEBUG
     assert(A != NULL);
     assert(row_i < A->rows);
-    assert(multiple != NAN); // fuck NaNs!
+    assert(!isnan(multiple));
   #endif
 
   int k = 0;

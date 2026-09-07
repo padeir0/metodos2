@@ -12,7 +12,18 @@
    Se `maxIter` for atingida, é provável que o resultado
    obtido esteja fora da tolerância.
 */
-int matrix_jacobi(const Matrix* A, const Matrix* B, Matrix* X, int maxIter, double tolerance) {
+int matrix_jacobi(const Matrix* A,
+                  const Matrix* B,
+                  Matrix* X,
+                  int maxIter,
+                  double tol) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(B != NULL);
+    assert(X != NULL);
+    assert(matrix_isValidLinearSystem(A, X, B));
+    assert(matrix_isDiagDominant(A));
+  #endif
   Matrix* NewX = matrix_new(X->rows, X->columns);
   Matrix* X_1 = X;
   Matrix* X_2 = NewX;
@@ -38,7 +49,8 @@ int matrix_jacobi(const Matrix* A, const Matrix* B, Matrix* X, int maxIter, doub
     }
 
     // norma de frobenius
-    if (matrix_distanceSquared(X_1, X_2) < tolerance*tolerance) {
+    if (matrix_distanceSquared(X_1, X_2)
+        < tol*tol) {
       break;
     }
 
@@ -66,7 +78,14 @@ int matrix_jacobi(const Matrix* A, const Matrix* B, Matrix* X, int maxIter, doub
 
    É apenas uma variação do algoritmo de Jacobi.
 */
-int matrix_gaussSeidel(const Matrix* A, const Matrix* B, Matrix* X, int maxIter, double tolerance) {
+int matrix_gaussSeidel(const Matrix* A, const Matrix* B, Matrix* X, int maxIter, double tol) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(B != NULL);
+    assert(X != NULL);
+    assert(matrix_isValidLinearSystem(A, X, B));
+    assert(matrix_isDiagDominant(A));
+  #endif
   Matrix* NewX = matrix_new(X->rows, X->columns);
   Matrix* X_1 = X;
   Matrix* X_2 = NewX;
@@ -95,7 +114,7 @@ int matrix_gaussSeidel(const Matrix* A, const Matrix* B, Matrix* X, int maxIter,
       i++;
     }
 
-    if (matrix_distanceSquared(X_1, X_2) < tolerance*tolerance) {
+    if (matrix_distanceSquared(X_1, X_2) < tol*tol) {
       break;
     }
 
