@@ -55,7 +55,7 @@ void createLinearSystem(Matrix* A, Matrix* X, Matrix* B) {
       sum += fabs(matrix_at(A, i, j));
       j++;
     }
-    matrix_setAt(A, i, i, sum);
+    matrix_setAt(A, i, i, 2*sum+1);
 
     i++;
   }
