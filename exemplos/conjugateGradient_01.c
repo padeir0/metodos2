@@ -32,7 +32,7 @@ stats solveForN(int order, double tol) {
   matrix_setAll(X_grad, 0);
 
   clock_t start = clock();
-  int iter_grad = matrix_gradient(A, X_grad, B, MAXITER, tol);
+  int iter_grad = matrix_conjugateGradient(A, X_grad, B, MAXITER, tol);
   if (iter_grad >= MAXITER) {
     printf("Método dos Gradientes não convergiu!\n");
     double dist = matrix_distanceSquared(X_grad, solution);
@@ -63,12 +63,12 @@ int main(void) {
   srand(42);
   double tol = 1;
   printf("# tol\titer\tseconds\n");
-  while (tol > 1e-8) {
+  while (tol > 1e-14) {
     int i = 0;
     double iter_sum = 0;
     double seconds_sum = 0;
     while (i < 100) {
-      stats out = solveForN(8, tol);
+      stats out = solveForN(100, tol);
       iter_sum += (double)out.iter;
       seconds_sum += (double)out.time / (double)CLOCKS_PER_SEC;
       i++;
