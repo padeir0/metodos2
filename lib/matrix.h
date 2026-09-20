@@ -425,6 +425,27 @@ void matrix_scalarMult(const Matrix* A, double scalar, Matrix* C) {
   }
 }
 
+/* Faz o produto interno de dois vetores coluna. */
+static inline
+double matrix_innerProduct(const Matrix* A, const Matrix* B) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(B != NULL);
+    assert(A->rows == B->rows);
+    assert(A->columns == 1);
+    assert(B->columns == 1);
+  #endif
+  double out = 0;
+  int i = 0;
+  while (i < A->rows) {
+    double a_i = matrix_at(A, i, 0);
+    double b_i = matrix_at(B, i, 0);
+    out += a_i * b_i;
+    i++;
+  }
+  return out;
+}
+
 // C = A * B (produto matricial padrão); requer A->columns == B->rows,
 // C->rows == A->rows e C->columns == B->columns. Não aloca.
 //
@@ -694,5 +715,65 @@ void matrix_print(const Matrix* A, int precision) {
   free(buffer);
 }
 /* END: PRETTY PRINT */
+
+/* BEGIN: utils */
+/* Cria um sistema pseudo-aleatório com matriz A invertivel, simétrica, positiva-definida e diagonal dominante.
+   O parametro `minmag` é o menor valor em módulo que um coeficiente pode ter,
+   enquanto `maxmag` é o maior valor em módulo. 
+
+   A matrix `X` passada como parâmetro é tomada como solução do sistema. B := AX.
+   As propriedades de A são garantidas pelo teorema de Gershgorin.
+*/
+void matrix_createLinearSystem(Matrix* A, const Matrix* X, Matrix* B, double minmag, double maxmag) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(X != NULL);
+    assert(B != NULL);
+    assert(matrix_isSquare(A));
+    assert(matrix_isValidLinearSystem(A, X, B));
+    assert(minmag > 0);
+    assert(maxmag > 0);
+  #endif
+
+  int relativeSize = (int)floor(maxmag/minmag);
+
+  #if DEBUG
+    assert(relativeSize <= RAND_MAX);
+  #endif
+
+  int N = A->rows;
+
+  // cria A como uma matriz simétrica
+  int i = 0;
+  while (i < N) {
+    int j = i + 1;
+    while (j < N) {
+      double sign = (rand() % 2 == 0) ? 1 : -1;
+      double absValue = (rand() % relativeSize) * minmag;
+      double a_ij = sign * absValue;
+      matrix_setAt(A, i, j, a_ij);
+      matrix_setAt(A, j, i, a_ij); // espelha
+      j++;
+    }
+    i++;
+  }
+
+  // garante dominância da diagonal
+  i = 0;
+  while (i < N) {
+    double sum = 0;
+    int j = 0;
+    while (j < N) {
+      if (j != i) sum += fabs(matrix_at(A, i, j));
+      j++;
+    }
+    matrix_setAt(A, i, i, 2*sum + 1);
+    i++;
+  }
+
+  // define B := AX
+  matrix_mult(A, X, B);
+}
+/* END: utils */
 
 #endif

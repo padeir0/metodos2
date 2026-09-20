@@ -15,53 +15,8 @@
 // número máximo de iterações dos algoritmos
 #define MAXITER 1000
 
-// pra gerar a matriz aleatória
-#define COEFRANGE 1000
-#define COEFMIN -500
-
 // coeficiente de relaxamento do método de SOR
 #define WRELAX 0.97
-
-// cria um sistema pseudo-aleatório com diagonal dominante
-void createLinearSystem(Matrix* A, Matrix* X, Matrix* B) {
-  #if DEBUG
-    assert(A != NULL);
-    assert(B != NULL);
-    assert(A->rows == A->columns);
-    assert(B->rows == A->columns);
-    assert(X->rows = A->columns);
-    assert(X->columns == 1);
-    assert(B->columns == 1);
-  #endif
-  srand(42);
-
-  matrix_setAll(X, 1);
-  
-  int N = A->rows;
-  int i = 0;
-  while (i < N) {
-    int j = 0;
-    while (j < N) {
-      if (i != j) {
-        double a_ij = rand() % COEFRANGE + COEFMIN;
-        matrix_setAt(A, i, j, a_ij);
-      }
-      j++;
-    }
-
-    j = 0;
-    double sum = 0;
-    while (j < N) {
-      sum += fabs(matrix_at(A, i, j));
-      j++;
-    }
-    matrix_setAt(A, i, i, 2*sum+1);
-
-    i++;
-  }
-
-  matrix_mult(A, X, B);
-}
 
 void solveForN(int ORDER) {
   Matrix* A = matrix_new(ORDER, ORDER);
@@ -69,9 +24,11 @@ void solveForN(int ORDER) {
   Matrix* X_gaussSeidel = matrix_new(ORDER, 1);
   Matrix* X_SOR = matrix_new(ORDER, 1);
   Matrix* B = matrix_new(ORDER, 1);
-  Matrix* solution = matrix_new(ORDER, 1);
 
-  createLinearSystem(A, solution, B);
+  Matrix* solution = matrix_new(ORDER, 1);
+  matrix_setAll(solution, 1); // solution = [1, ..., 1]
+
+  matrix_createLinearSystem(A, solution, B, 1e-4, 1e4);
   matrix_setAll(X_jacobi, 2);
   matrix_setAll(X_gaussSeidel, 2);
   matrix_setAll(X_SOR, 2);

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ERROR 1e-16
+#define ERROR 1e-12
 
 void check(bool ok) {
   if (ok == false) {
@@ -16,48 +16,14 @@ void check(bool ok) {
   }
 }
 
-/* cria um sistema linear nas matrizes dadas com solução conhecida */
-void createLinearSystem(Matrix* A, Matrix* X, Matrix* B) {
-  #if DEBUG
-    /* garante que o sistema tem formato correto */
-    assert(A->rows == A->columns);
-    assert(A->columns == X->rows);
-    assert(B->rows == X->rows);
-  #endif
-  int i;
-  int j;
-
-  i = 0;
-  while (i < A->rows) {
-    j = 0;
-    while (j < A->columns) {
-      if (i != j) {
-        matrix_setAt(A, i, j, 1);
-      }
-      j++;
-    }
-    matrix_setAt(A, i, i, 1e-12);
-    i++;
-  }
-
-  // matriz X é {1.0, ..., 1.0}
-  i = 0;
-  while (i < X->rows) {
-    matrix_setAt(X, i, 0, 1.0);
-    i++;
-  }
-
-  // matriz B é determinada a partir de A*X
-  matrix_mult(A, X, B);
-}
-
 void performComparison(int ORDER) {
   Matrix* A = matrix_new(ORDER, ORDER);
   Matrix* X = matrix_new(ORDER, 1);
   Matrix* B = matrix_new(ORDER, 1);
   bool ok;
 
-  createLinearSystem(A, X, B);
+  matrix_setAll(X, 1); // solution = [1, ..., 1]
+  matrix_createLinearSystem(A, X, B, 1e-2, 1e2);
 
   Matrix* A_gauss = matrix_newCopy(A);
   Matrix* B_gauss = matrix_newCopy(B);

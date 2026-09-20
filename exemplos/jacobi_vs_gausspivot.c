@@ -17,57 +17,12 @@
 // pivô/diagonal nula), não é uma medida de precisão da solução
 #define PIVOT_ERROR 1e-8
 
-// pra gerar a matriz aleatória
-#define COEFRANGE 1000
-#define COEFMIN -500
-
-/* cria um sistema pseudo-aleatório com diagonal dominante */
-void createLinearSystem(Matrix* A, Matrix* X, Matrix* B) {
-  #if DEBUG
-    assert(A != NULL);
-    assert(B != NULL);
-    assert(A->rows == A->columns);
-    assert(B->rows == A->columns);
-    assert(X->rows = A->columns);
-    assert(X->columns == 1);
-    assert(B->columns == 1);
-  #endif
-  srand(42);
-
-  matrix_setAll(X, 1);
-
-  int N = A->rows;
-  int i = 0;
-  while (i < N) {
-    int j = 0;
-    while (j < N) {
-      if (i != j) {
-        double a_ij = rand() % COEFRANGE + COEFMIN;
-        matrix_setAt(A, i, j, a_ij);
-      }
-      j++;
-    }
-
-    j = 0;
-    double sum = 0;
-    while (j < N) {
-      sum += fabs(matrix_at(A, i, j));
-      j++;
-    }
-    matrix_setAt(A, i, i, 2*sum+1);
-
-    i++;
-  }
-
-  matrix_mult(A, X, B);
-}
-
 void performComparison(int order) {
   Matrix* A = matrix_new(order, order);
   Matrix* X = matrix_new(order, 1);
   Matrix* B = matrix_new(order, 1);
 
-  createLinearSystem(A, X, B);
+  matrix_createLinearSystem(A, X, B, 1e-4, 1e4);
 
   Matrix* X_jacobi = matrix_new(order, 1);
   matrix_setAll(X_jacobi, 2);
