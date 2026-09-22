@@ -68,7 +68,7 @@ int main(void) {
     double iter_sum = 0;
     double seconds_sum = 0;
     while (i < 100) {
-      stats out = solveForN(100, tol);
+      stats out = solveForN(256, tol);
       iter_sum += (double)out.iter;
       seconds_sum += (double)out.time / (double)CLOCKS_PER_SEC;
       i++;

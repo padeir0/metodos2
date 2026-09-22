@@ -57,15 +57,16 @@ int matrix_conjugateGradient(const Matrix* A, Matrix* X, const Matrix* B, int it
   Matrix* r = matrix_new(X->rows, X->columns);
 
   // scratch space
-  Matrix* C = matrix_new(X->rows, X->columns);
+  Matrix* Ap = matrix_new(X->rows, X->columns);
   Matrix* D = matrix_new(X->rows, X->columns);
 
   // r := B - AX
-  matrix_mult(A, X, C); // C = AX
-  matrix_sub(B, C, r);
+  matrix_mult(A, X, D); // D := AX
+  matrix_sub(B, D, r);
+
   if (matrix_normSquared(r) < tol*tol) {
     matrix_free(&r);
-    matrix_free(&C);
+    matrix_free(&Ap);
     matrix_free(&D);
     return 0;
   }
@@ -74,29 +75,30 @@ int matrix_conjugateGradient(const Matrix* A, Matrix* X, const Matrix* B, int it
 
   int i = 0;
   do {
-    matrix_mult(A, p, C); // C = Ap
+    double r_dot_r = matrix_innerProduct(r, r);
+
+    matrix_mult(A, p, Ap);
     // alpha = <r, r> / <Ap, p>
-    double alpha = matrix_innerProduct(r, r) / matrix_innerProduct(C, p);
+    double alpha =  r_dot_r / matrix_innerProduct(Ap, p);
 
-    matrix_scalarMult(p, alpha, C); // C = alpha*p
-    matrix_add(X, C, X);            // X += alpha*p
+    matrix_scalarMult(p, alpha, D); // D = alpha*p
+    matrix_add(X, D, X);            // X += alpha*p
 
-    matrix_mult(A, C, D); // D = A*(alpha*p)
-    matrix_sub(r, D, C); // C = r_{k+1} = r_k - A*(alpha*p)
-    if (matrix_normSquared(C) < tol*tol) {
+    matrix_scalarMult(Ap, alpha, D); // D = alpha*Ap
+    matrix_sub(r, D, r); // r_{k+1} = r_k - alpha*Ap
+    if (matrix_normSquared(r) < tol*tol) {
       break;
     }
 
     // beta = <r_{k+1}, r_{k+1}> / <r, r>
-    double beta = matrix_innerProduct(C, C) / matrix_innerProduct(r, r);
+    double beta = matrix_innerProduct(r, r) / r_dot_r;
     matrix_scalarMult(p, beta, p); // p *= beta
-    matrix_add(p, C, p);           // p += r_{k+1}
-    matrix_copy(C, r); // r_k = r_{k+1}
+    matrix_add(p, r, p);          // p += r_{k+1}
     i++;
   } while (i < itermax);
 
   matrix_free(&r);
-  matrix_free(&C);
+  matrix_free(&Ap);
   matrix_free(&D);
   matrix_free(&p);
   return i;
