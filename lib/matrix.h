@@ -14,8 +14,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-#define DEBUG 1
-
 typedef struct {
   double* data;
   int rows;
@@ -63,6 +61,36 @@ int matrix_sameShape(const Matrix* A, const Matrix* B) {
 static inline
 bool matrix_isSquare(const Matrix* A) {
   return A->rows == A->columns;
+}
+
+/* Verifica se `A` é simétrica: |a_ij - a_ji| <= tol, para todo i < j.
+   Com tol == 0 a comparação é exata. Matrizes não quadradas não são
+   simétricas. Se algum elemento for NaN o resultado é false.
+*/
+static inline
+bool matrix_isSymetric(const Matrix* A, double tol) {
+  #if DEBUG
+    assert(A != NULL);
+    assert(tol >= 0);
+  #endif
+
+  if (matrix_isSquare(A) == false) {
+    return false;
+  }
+
+  int i = 0;
+  while (i < A->rows) {
+    int j = i + 1;
+    while (j < A->columns) {
+      double diff = fabs(matrix_at(A, i, j) - matrix_at(A, j, i));
+      if (!(diff <= tol)) { // escrito assim pra pegar NaN
+        return false;
+      }
+      j++;
+    }
+    i++;
+  }
+  return true;
 }
 
 static inline
@@ -250,6 +278,10 @@ void matrix_copyBlock(const Matrix* A, int in_row_start, int in_row_end, int in_
     assert(in_row_end-in_row_start == out_row_end-out_row_start);
     assert(in_column_end-in_column_start == out_column_end-out_column_start);
   #endif
+
+  // we don't use those on the code, just on the asserts
+  (void)out_row_end;
+  (void)out_column_end;
 
   int row_len = in_row_end-in_row_start;
   int column_len = in_column_end-in_column_start;

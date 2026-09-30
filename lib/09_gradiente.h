@@ -15,6 +15,7 @@ int matrix_gradient(const Matrix* A, Matrix* X, const Matrix* B, int itermax, do
     assert(X != NULL);
     assert(tol >= 0);
     assert(matrix_isValidLinearSystem(A, X, B));
+    assert(matrix_isSymetric(A, tol));
   #endif
 
   Matrix* r = matrix_new(X->rows, X->columns);
@@ -45,13 +46,18 @@ int matrix_gradient(const Matrix* A, Matrix* X, const Matrix* B, int itermax, do
    A implementação ta meio bagunçada pq eu fiz "alocação de registradores" mentalmente
    pra usar o mínimo de scratch space que consegui.
 */
-int matrix_conjugateGradient(const Matrix* A, Matrix* X, const Matrix* B, int itermax, double tol) {
+int matrix_conjugateGradient(const Matrix* A,
+                             Matrix* X,
+                             const Matrix* B,
+                             int itermax,
+                             double tol) {
   #if DEBUG
     assert(A != NULL);
     assert(B != NULL);
     assert(X != NULL);
     assert(tol >= 0);
     assert(matrix_isValidLinearSystem(A, X, B));
+    assert(matrix_isSymetric(A, tol));
   #endif
 
   Matrix* r = matrix_new(X->rows, X->columns);
@@ -87,6 +93,7 @@ int matrix_conjugateGradient(const Matrix* A, Matrix* X, const Matrix* B, int it
     matrix_scalarMult(Ap, alpha, D); // D = alpha*Ap
     matrix_sub(r, D, r); // r_{k+1} = r_k - alpha*Ap
     if (matrix_normSquared(r) < tol*tol) {
+      i++;
       break;
     }
 

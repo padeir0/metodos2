@@ -62,21 +62,30 @@ stats solveForN(int order, double tol) {
 int main(void) {
   srand(42);
   double tol = 1;
-  printf("# tol\titer\tseconds\n");
-  while (tol > 1e-14) {
+
+  #if DEBUG
+    printf("DEBUG ATIVADO!\n");
+  #endif
+  
+  printf("# tol\titer\tmaxiter\tseconds\n");
+  while (tol > 1e-12) {
     int i = 0;
     double iter_sum = 0;
     double seconds_sum = 0;
+    int maxIter = 0;
     while (i < 100) {
-      stats out = solveForN(256, tol);
+      stats out = solveForN(16, tol);
       iter_sum += (double)out.iter;
       seconds_sum += (double)out.time / (double)CLOCKS_PER_SEC;
+      if (out.iter > maxIter) {
+        maxIter = out.iter;
+      }
       i++;
     }
     int prec = (int)fabs(ceil(log10(tol)));
     iter_sum /= (double)i;
     seconds_sum /= (double)i;
-    printf("%d, %.1f, %.6f\n", prec, iter_sum, seconds_sum);
+    printf("%d, %.1f, %d, %.6f\n", prec, iter_sum, maxIter, seconds_sum);
     tol /= 10;
   }
 }

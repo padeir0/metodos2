@@ -1,0 +1,5 @@
+#!/bin/bash
+cc=${2:-gcc}
+"$cc" -std=c99 -O2 "$1" -o output -lm
+./output
+rm output
