@@ -7,8 +7,19 @@
 #ifndef M2_linearDiffEq_H
 #define M2_linearDiffEq_H
 
+/*
+Discretiza uma EDO no formato:
+  u''(t) = u(t) + v(t)u(t) + w(t)u'(t)
+  x(a) = x_a
+  x(b) = x_b
+
+Onde `n` é o número de intervalos para discretizar
+
+Os vetores A,B,C e D correspondem aos vetores de um sistema
+tridiagonal e tem seus nomes análogos em 04_tridiagonal.h.
+*/
 static inline
-void matrix_buildTridiagonalSystem(RealFunction u, RealFunction v, RealFunction w,
+void de_LinearBuildTriSys(RealFunction u, RealFunction v, RealFunction w,
                                    Matrix* A, Matrix* B, Matrix* C, Matrix* D,
                                    int n, double a, double b, double x_a, double x_b) {
   #if DEBUG

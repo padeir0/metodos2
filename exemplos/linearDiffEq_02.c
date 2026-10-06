@@ -63,7 +63,7 @@ double maxError(int n) {
   Matrix* D = matrix_new(rows, 1);
   Matrix* X = matrix_new(rows, 1);
 
-  matrix_buildTridiagonalSystem(odeU, odeV, odeW, A, B, C, D, n,
+  de_LinearBuildTriSys(odeU, odeV, odeW, A, B, C, D, n,
                                 T_A, T_B, exact(T_A), exact(T_B));
   matrix_solveTridiagonal(A, B, C, X, D);
 

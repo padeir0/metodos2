@@ -46,7 +46,7 @@ int main(void) {
   Matrix* D = matrix_new(rows, 1);
   Matrix* X = matrix_new(rows, 1);
 
-  matrix_buildTridiagonalSystem(odeU, odeV, odeW, A, B, C, D, N,
+  de_LinearBuildTriSys(odeU, odeV, odeW, A, B, C, D, N,
                                 T_A, T_B, alpha, beta);
   matrix_solveTridiagonal(A, B, C, X, D);
 
