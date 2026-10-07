@@ -6,7 +6,7 @@
 #define M2_TRIDIAGONAL_H
 
 /* Modifica os inputs! */
-void matrix_solveTridiagonal(Matrix* A, Matrix* B, Matrix* C, Matrix* X, Matrix* D) {
+void matrix_solveTridiagonal(const Matrix* A, Matrix* B, const Matrix* C, Matrix* X, Matrix* D) {
   #if DEBUG
     assert(A != NULL); assert(B != NULL); assert(C != NULL);
     assert(X != NULL); assert(D != NULL);

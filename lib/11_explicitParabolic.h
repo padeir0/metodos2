@@ -1,6 +1,5 @@
 #include "matrix.h"
 #include "basicTypes.h"
-#include "04_tridiagonal.h"
 
 #include <float.h>
 
