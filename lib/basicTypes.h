@@ -4,7 +4,7 @@
 #include "matrix.h"
 
 typedef double (*RealFunction)(double x);
-typedef double (*Real2Function)(double x, double t);
+typedef double (*Real2Function)(double x, double y);
 typedef void (*MatrixMuncher)(Matrix* m);
 
 #endif
