@@ -48,7 +48,20 @@ Isso é uma condição de Dirichlet onde as ondas são refletidas perfeitamente.
 */
 static inline
 void de_solveWave(Real2Function f, Real2Function g, double C, MatrixMuncher munch, double h, double d, double time) {
+  // UNSAFE: argumentos fora desses limites abortam o programa.
+  #if DEBUG
+    assert(f != NULL);
+    assert(g != NULL);
+    assert(munch != NULL);
+    assert(C > 0);
+    assert(h > 0);
+    assert(d > 0);
+    assert(time >= 0);
+  #endif
   int dim = (int)lround(1 / h) + 1;
+  #if DEBUG
+    assert(dim >= 3);
+  #endif
   Matrix* grid_prev = matrix_new(dim, dim); // t-1
   Matrix* grid_curr = matrix_new(dim, dim); // t
   Matrix* grid_next = matrix_new(dim, dim); // t+1
