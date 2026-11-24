@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Refletor: argumentos</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+  <script src="../code.js"></script>
+</head>
+<body>
+  <h2>Exemplo 3: refletor parabólico</h2>
+  <div class="codecols">
+<pre><code class="language-c">#define WAVELENGTH 0.05 // comprimento de onda
+#define SIGMA      0.04 // largura do pacote em x
+#define PACKET_X   0.18 // centro inicial do pacote
+#define BEAM_WIDTH 0.4  // semilargura do feixe em y
+
+// espelho: x = VERTEX_X - (y - CENTER_Y)^2 / (4 F)
+// aberto para a esquerda, foco em (0.62, 0.5)
+#define CENTER_Y             0.5
+#define MIRROR_VERTEX_X      0.92
+#define MIRROR_FOCAL         0.3
+#define MIRROR_HALF_APERTURE 0.3
+#define MIRROR_THICKNESS     0.015
+
+#define PI 3.14159265358979323846</code></pre>
+<pre><code class="language-c">// pacote plano: gaussiana * cos(k (x - x0))
+double initial(double x, double y) {
+  double k = 2 * PI / WAVELENGTH;
+  double dx = x - PACKET_X;
+  double envelopeY =
+      exp(-pow((y - CENTER_Y) / BEAM_WIDTH, 6));
+  return exp(-dx*dx / (2*SIGMA*SIGMA))
+         * cos(k*dx) * envelopeY;
+}
+
+double mirror(double x, double y) {
+  double dy = y - CENTER_Y;
+  if (fabs(dy) &gt; MIRROR_HALF_APERTURE) {
+    return 0;
+  }
+  double xCurve = MIRROR_VERTEX_X
+                  - dy*dy / (4*MIRROR_FOCAL);
+  // distância medida na normal, pra espessura
+  // ser igual nas partes inclinadas
+  double slope = dy / (2*MIRROR_FOCAL);
+  double distance =
+      fabs(x - xCurve) / sqrt(1 + slope*slope);
+  return distance &lt; MIRROR_THICKNESS / 2;
+}</code></pre>
+  </div>
+  <p class="small">Chamada: <code>de_solveWave(initial, mirror, C, printFrame, H, dt, T_END)</code>, com $c=1$, $h=1/200$, $\Delta t=0{,}9\,h/(c\sqrt2)$ e $t\in[0,1{,}2]$.</p>
+</body>
+</html>

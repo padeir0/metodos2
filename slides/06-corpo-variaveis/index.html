@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Corpo: variáveis</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+  <script src="../code.js"></script>
+</head>
+<body>
+  <div class="text-container left">
+    <h2>Corpo da função: variáveis alocadas</h2>
+<pre><code class="language-c">int dim = (int)lround(1 / h) + 1;
+Matrix* grid_prev = matrix_new(dim, dim); // t-1
+Matrix* grid_curr = matrix_new(dim, dim); // t
+Matrix* grid_next = matrix_new(dim, dim); // t+1
+
+matrix_setAll(grid_prev, 0);
+
+// condição inicial (seta grid_curr)
+{
+  int i = 0;
+  while (i &lt; dim) {
+    int j = 0;
+    while (j &lt; dim) {
+      double u_ij = f(i*h, j*h);
+      matrix_setAt(grid_curr, i, j, u_ij);
+      j++;
+    }
+    i++;
+  }
+  // fronteiras
+  i_de_waveSetZeroes(grid_curr, g, h);
+  munch(grid_curr);
+}</code></pre>
+    <p class="small">Três matrizes <code>dim × dim</code> guardam os níveis $t-1$, $t$ e $t+1$. <code>i_de_waveSetZeroes</code> zera as bordas e os nós onde <code>g(x,y)</code> é positivo.</p>
+  </div>
+</body>
+</html>

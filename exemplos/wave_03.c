@@ -11,7 +11,7 @@
 #define C      1.0
 #define N      151
 #define H      (1.0 / (N - 1))
-#define T_END  1.0
+#define T_END  2.0
 #define STRIDE 4
 
 #define SOURCE_X 0.2

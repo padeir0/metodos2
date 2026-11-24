@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>API de de_solveWave</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+  <script src="../code.js"></script>
+</head>
+<body>
+  <div class="text-container left">
+    <h2>API: <code>de_solveWave</code></h2>
+<pre><code class="language-c">void de_solveWave(Real2Function f, Real2Function g, double C,
+                  MatrixMuncher munch, double h, double d, double time);</code></pre>
+    <table>
+      <thead><tr><th>Argumento</th><th>Significado</th></tr></thead>
+      <tbody>
+        <tr><td><code>f</code></td><td>condição inicial: $u(x,y,0)=f(x,y)$</td></tr>
+        <tr><td><code>g</code></td><td>obstáculo: $u=0$ onde $g(x,y)\gt 0$</td></tr>
+        <tr><td><code>C</code></td><td>velocidade de propagação $c$</td></tr>
+        <tr><td><code>munch</code></td><td>callback chamado com o quadro atual em $t=0$ e a cada passo</td></tr>
+        <tr><td><code>h</code></td><td>espaçamento da malha (malha de $(1/h+1)^2$ nós)</td></tr>
+        <tr><td><code>d</code></td><td>passo de tempo $\Delta t$</td></tr>
+        <tr><td><code>time</code></td><td>tempo final</td></tr>
+      </tbody>
+    </table>
+    <p class="small"><code>Real2Function</code> = <code>double (*)(double x, double y)</code>,</p>
+    <p class="small"><code>MatrixMuncher</code> = <code>void (*)(Matrix*)</code>.</p>
+  </div>
+</body>
+</html>

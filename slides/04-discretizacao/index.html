@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Discretização</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+</head>
+<body>
+  <div class="text-container left">
+    <h2>Discretização da EDP</h2>
+    <p>Malha $x_i=ih$, $y_j=jh$, $t_n=n\,\Delta t$, com $u^n_{i,j}\approx u(x_i,y_j,t_n)$. Diferenças centrais:</p>
+    \[ u_{tt}\approx\frac{u^{n+1}_{i,j}-2u^n_{i,j}+u^{n-1}_{i,j}}{\Delta t^2},\qquad
+       u_{xx}+u_{yy}\approx\frac{L^n_{i,j}}{h^2} \]
+    \[ L^n_{i,j}=u^n_{i+1,j}+u^n_{i-1,j}+u^n_{i,j+1}+u^n_{i,j-1}-4u^n_{i,j} \]
+
+    <p> Substituindo na equação da onda:</p>
+    \[ u_{tt} = c^2 (u_{xx} + u_{yy}) \Rightarrow \frac{u^{n+1}_{i,j}-2u^n_{i,j}+u^{n-1}_{i,j}}{\Delta t^2} = \frac{c^2}{h^2} L^n_{i,j} \]
+
+    <p>Isolando $u^{n+1}$, com $r=c\,\Delta t/h$:</p>
+    \[ \boxed{\,u^{n+1}_{i,j}=2u^n_{i,j}-u^{n-1}_{i,j}+r^2L^n_{i,j}\,} \]
+  </div>
+</body>
+</html>

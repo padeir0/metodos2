@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A EDP da onda em 2D</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+</head>
+<body>
+  <div class="text-container">
+    <h2>A equação da onda em 2D</h2>
+    \[ u_{tt}(x,y,t) = c^2\big(u_{xx}(x,y,t)+u_{yy}(x,y,t)\big),\]
+    \[ (x,y)\in[0,1]^2,\ t\gt 0. \]
+    <p>$u$ é a amplitude da onda e $c\gt 0$ a velocidade de propagação.</p>
+    </br>
+    <p>Condições iniciais:</p>
+    \[ u(x,y,0)=f(x,y),\qquad u_t(x,y,0)=0 \]
+    </br>
+    <p>Contorno (Dirichlet): a onda é refletida, com inversão de sinal.</p>
+    \[ u=0 \quad\text{nas bordas do quadrado e onde } g(x,y)\gt 0 \]
+  </div>
+</body>
+</html>

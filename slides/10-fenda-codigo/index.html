@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fenda dupla: argumentos</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+  <script src="../code.js"></script>
+</head>
+<body>
+  <h2>Exemplo 2: fenda dupla</h2>
+  <div class="codecols">
+<pre><code class="language-c">#define SOURCE_X 0.2
+#define SOURCE_Y 0.5
+#define SIGMA    0.03
+
+#define WALL_X          0.5
+#define WALL_THICKNESS  0.02
+#define SLIT_WIDTH      0.05
+// distância entre os centros das fendas
+#define SLIT_SEPARATION 0.3
+
+double initial(double x, double y) {
+  double dx = x - SOURCE_X;
+  double dy = y - SOURCE_Y;
+  return exp(-(dx*dx + dy*dy)
+             / (2*SIGMA*SIGMA));
+}</code></pre>
+<pre><code class="language-c">// uma fenda de largura SLIT_WIDTH
+// centrada em `center`
+static int inSlit(double y, double center) {
+  return fabs(y - center) &lt; SLIT_WIDTH / 2;
+}
+
+// obstáculo: parede vertical em x = WALL_X
+// com duas fendas simétricas em torno de y = 0.5
+double wall(double x, double y) {
+  if (fabs(x - WALL_X) &gt;= WALL_THICKNESS / 2) {
+    return 0;
+  }
+  int open =
+      inSlit(y, 0.5 - SLIT_SEPARATION/2)
+      || inSlit(y, 0.5 + SLIT_SEPARATION/2);
+  return !open;
+}</code></pre>
+  </div>
+  <p class="small">Chamada: <code>de_solveWave(initial, wall, C, printFrame, H, dt, T_END)</code>, com $c=1$, $h=1/150$, $\Delta t=0{,}9\,h/(c\sqrt2)$ e $t\in[0,1]$.</p>
+</body>
+</html>

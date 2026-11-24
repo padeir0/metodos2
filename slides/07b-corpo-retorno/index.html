@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Corpo: avanço e retorno</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+  <script src="../code.js"></script>
+</head>
+<body>
+  <div class="text-container left">
+    <h2>Corpo da função: avanço e retorno</h2>
+<pre><code class="language-c">while (k*d &lt; time) {
+  // ... laços em i e j (slide anterior): calculam grid_next
+
+  { // swap
+    Matrix* temp = grid_prev;
+    grid_prev = grid_curr;
+    grid_curr = grid_next;
+    grid_next = temp;
+  }
+
+  i_de_waveSetZeroes(grid_curr, g, h);
+  munch(grid_curr);
+
+  k++;
+}
+
+matrix_free(&amp;grid_prev);
+matrix_free(&amp;grid_curr);
+matrix_free(&amp;grid_next);
+// retorno: void; os quadros saem pelo munch</code></pre>
+    <p class="small">Depois de cada passo os buffers giram ($t-1\leftarrow t\leftarrow t+1$) sem copiar dados. Ao fim, as três matrizes são liberadas.</p>
+  </div>
+</body>
+</html>

@@ -6,12 +6,18 @@
 
 /* Mesmo experimento de wave_03.c, mas com fenda dupla: as duas ondas
    circulares que saem das fendas se somam e formam um padrão de interferência
-   (faixas de reforço e de cancelamento). Saída no formato de wave_02.c. */
+   (faixas de reforço e de cancelamento). Saída no formato de wave_02.c.
+
+   O lado esquerdo (incidente + reflexão) é bem mais forte que o direito, então
+   a escala de cor padrão do animate2d.py deixa a direita quase apagada. Pra
+   escalar a cor só pelo lado direito (a esquerda satura) e realçar as franjas:
+     ./run wave_04.c | python3 ../dados/animate2d.py -o wave_04.gif \
+         --scale-x 0.55 1 --gamma 0.5 */
 
 #define C      1.0
 #define N      151
 #define H      (1.0 / (N - 1))
-#define T_END  1.0
+#define T_END  2.0
 #define STRIDE 4
 
 #define SOURCE_X 0.2
@@ -20,13 +26,13 @@
 
 #define WALL_X          0.5
 #define WALL_THICKNESS  0.02
-#define SLIT_WIDTH      0.05
+#define SLIT_WIDTH      0.1
 #define SLIT_SEPARATION 0.3 // distância entre os centros das fendas
 
 double initial(double x, double y) {
   double dx = x - SOURCE_X;
   double dy = y - SOURCE_Y;
-  return exp(-(dx*dx + dy*dy) / (2*SIGMA*SIGMA));
+  return 10*exp(-(dx*dx + dy*dy) / (2*SIGMA*SIGMA));
 }
 
 // uma fenda de largura SLIT_WIDTH centrada em `center`

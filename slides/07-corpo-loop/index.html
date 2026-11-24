@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Corpo: loop</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+  <script src="../code.js"></script>
+</head>
+<body>
+  <h2>Corpo da função: loop principal</h2>
+<div class="tight"><pre><code class="language-c">int k = 1;
+while (k*d &lt; time) {
+  int i = 1;
+  while (i &lt; dim-1) {
+    int j = 1;
+    while (j &lt; dim-1) {
+      double u_prev   = matrix_at(grid_prev, i, j);
+      double u_curr   = matrix_at(grid_curr, i, j);
+      double u_left   = matrix_at(grid_curr, i-1, j);
+      double u_right  = matrix_at(grid_curr, i+1, j);
+      double u_top    = matrix_at(grid_curr, i, j-1);
+      double u_bottom = matrix_at(grid_curr, i, j+1);
+
+      double delta = (d * C) / h;
+      double laplacian = (delta*delta)
+          * (u_bottom + u_top + u_right + u_left - 4 * u_curr);
+
+      double u_next;
+      if (k == 1) {
+        u_next = u_curr + laplacian/2;
+      } else {
+        u_next = 2 * u_curr - u_prev + laplacian;
+      }
+
+      matrix_setAt(grid_next, i, j, u_next);
+      j++;
+    }
+    i++;
+  }
+  // (continua no próximo slide)</code></pre></div>
+</body>
+</html>

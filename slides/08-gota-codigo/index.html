@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gota: argumentos</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+  <script src="../code.js"></script>
+</head>
+<body>
+  <div class="text-container left">
+    <h2>Exemplo 1: gota</h2>
+<pre><code class="language-c">double initial(double x, double y) {
+  const double x0 = 0.35;
+  const double y0 = 0.50;
+  const double sigma = 0.06;
+  double dx = x - x0;
+  double dy = y - y0;
+  return exp(-(dx*dx + dy*dy) / (2*sigma*sigma));
+}
+
+double noWall(double x, double y) { (void)x; (void)y; return 0; }</code></pre>
+    <p class="small">Chamada: <code>de_solveWave(initial, noWall, C, printFrame, H, dt, T_END)</code>, com $c=1$, $h=1/80$, $\Delta t=0{,}9\,h/(c\sqrt2)$ e $t\in[0,2]$.</p>
+  </div>
+</body>
+</html>

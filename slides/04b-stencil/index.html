@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stencil</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../nav.js"></script>
+</head>
+<body>
+  <div class="text-container left">
+    <h2>Stencil</h2>
+    \[ \,u^{(n+1)}_{i,j}=2u^{(n)}_{i,j}-u^{(n-1)}_{i,j}+r^2L^{(n)}_{i,j}\, \]
+    \[ L^{(n)}_{i,j}=u^{(n)}_{i+1,j}+u^{(n)}_{i-1,j}+u^{(n)}_{i,j+1}+u^{(n)}_{i,j-1}-4u^{(n)}_{i,j}. \]
+
+    <figure>
+      <img src="stencil.png" alt="Stencil da discretização da EDP da onda">
+      <figcaption>Stencil da discretização por diferenças finitas. Nomes "next", "prev", etc correspondem ao nome do código</figcaption>
+    </figure>
+
+    <p><b>Primeiro passo:</b> $u_t(\cdot,0)=0$ dá $u^{(-1)}=u^{(1)}$, logo $u^{(1)}_{i,j}=u^{(0)}_{i,j}+\tfrac{r^2}{2}L^{(0)}_{i,j}$.</p>
+  </div>
+</body>
+</html>
