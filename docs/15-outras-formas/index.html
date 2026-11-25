@@ -10,12 +10,10 @@
 <body>
   <div class="text-container left">
     <h2>Outras formas da EDP</h2>
-    <p><b>Amortecimento</b> ("esponja"), com $\gamma(x,y)\ge 0$: a onda perde energia onde $\gamma\gt 0$.</p>
+    <p><b>Amortecimento</b> ("esponja"): A função $\gamma(x,y)\ge 0$ descreve o amortecimento, a onda perde energia onde $\gamma\gt 0$.</p>
     \[ u_{tt}+\gamma\,u_t=c^2(u_{xx}+u_{yy}) \]
     <p>Recorrência explícita, com $a=\gamma\Delta t/2$ e a mesma CFL:</p>
     \[ u^{n+1}_{i,j}=\frac{2u^n_{i,j}-(1-a)\,u^{n-1}_{i,j}+r^2L^n_{i,j}}{1+a} \]
-    <p><b>Velocidade inicial</b> $u_t(x,y,0)=v_0(x,y)$ muda o primeiro passo:</p>
-    \[ u^1_{i,j}=u^0_{i,j}+\Delta t\,v_0+\tfrac{\Delta t^2}{2}\big(c^2L^0_{i,j}/h^2-\gamma v_0\big) \]
     <p><b>Contorno de Neumann</b> (parede rígida para pressão): $\partial u/\partial n=0$, reflexão sem inversão de sinal.</p>
     <p><b>Contorno absorvente</b> de 1ª ordem: $u_t+c\,\partial u/\partial n=0$, para ondas que saem na normal.</p>
   </div>
